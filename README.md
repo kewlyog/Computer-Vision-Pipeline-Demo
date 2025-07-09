@@ -12,7 +12,7 @@ This project is a demo-ready, end-to-end computer vision pipeline for real-time 
 
 1. Clone the repository:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/kewlyog/Computer-Vision-Pipeline-Demo
    cd Computer_Vision_Pipeline_New
    ```
 2. Install dependencies:
