@@ -1,5 +1,5 @@
 opencv-python-headless
 ultralytics
 numpy
-streamlit 
+streamlit>=1.18.0 
 filterpy 

@@ -11,7 +11,10 @@ from tracker import Sort
 # Load YOLOv8 model (caches on first run)
 @st.cache_resource
 def load_model():
-    return YOLO("yolov8n.pt")  # nano model for speed
+    # return YOLO("yolov8n.pt")  # nano model for speed
+    return YOLO("yolov8s.pt")  # small model
+    # return YOLO("yolov8m.pt")  # medium model
+    # return YOLO("yolov8l.pt")  # large model
 
 @st.cache_resource
 def load_tracker():
@@ -25,9 +28,17 @@ This demo processes an uploaded video for object detection and tracking using YO
 """)
 
 # Video upload
-MAX_MB = 120
-MAX_DURATION = 70  # seconds
-uploaded_file = st.file_uploader("Upload a video (max 120MB, 70s)", type=["mp4", "avi", "mov"])
+MAX_MB = 50
+MAX_DURATION = 50  # seconds
+uploaded_file = st.file_uploader("Upload a video (max 50MB, 50s)", type=["mp4", "avi", "mov"])
+
+if 'last_uploaded_file' not in st.session_state:
+    st.session_state['last_uploaded_file'] = None
+
+if uploaded_file is not None:
+    if uploaded_file != st.session_state['last_uploaded_file']:
+        st.session_state['last_uploaded_file'] = uploaded_file
+        st.rerun()
 
 FRAME_WINDOW = st.empty()
 
@@ -58,6 +69,8 @@ if uploaded_file is not None:
             tracker = load_tracker()
             processed_frames = []
             frame_count = 0
+            progress_bar = st.progress(0)
+            CONF_THRESH = 0.4
             while True:
                 ret, frame = cap.read()
                 if not ret:
@@ -68,6 +81,9 @@ if uploaded_file is not None:
                 confs = results[0].boxes.conf.cpu().numpy() if results[0].boxes is not None else []
                 clss = results[0].boxes.cls.cpu().numpy() if results[0].boxes is not None else []
                 names = model.model.names
+                # Filter by confidence threshold
+                keep = confs > CONF_THRESH
+                boxes, confs, clss = boxes[keep], confs[keep], clss[keep]
                 # Prepare detections for tracker: [x1, y1, x2, y2, conf]
                 dets = np.array([
                     [*box, conf] for box, conf in zip(boxes, confs)
@@ -85,6 +101,9 @@ if uploaded_file is not None:
                 if frame_count % int(fps) == 0:  # Show 1 frame per second
                     processed_frames.append(frame_rgb)
                 frame_count += 1
+                if total_frames > 0:
+                    progress_bar.progress(min(frame_count / total_frames, 1.0))
+            progress_bar.empty()
             cap.release()
             os.remove(tfile.name)
             st.success(f"Processed {frame_count} frames.")

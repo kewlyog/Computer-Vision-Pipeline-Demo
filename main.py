@@ -19,7 +19,8 @@ run = st.toggle("Start Camera", value=False, key="start_camera")
 # Load YOLOv8 model (caches on first run)
 @st.cache_resource
 def load_model():
-    return YOLO("yolov8n.pt")  # nano model for speed
+    # return YOLO("yolov8n.pt")  # nano model for speed
+    return YOLO("yolov8s.pt")  # medium model
 
 @st.cache_resource
 def load_tracker():
