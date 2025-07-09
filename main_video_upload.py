@@ -25,9 +25,9 @@ This demo processes an uploaded video for object detection and tracking using YO
 """)
 
 # Video upload
-MAX_MB = 50
-MAX_DURATION = 30  # seconds
-uploaded_file = st.file_uploader("Upload a video (max 50MB, 30s)", type=["mp4", "avi", "mov"])
+MAX_MB = 120
+MAX_DURATION = 70  # seconds
+uploaded_file = st.file_uploader("Upload a video (max 120MB, 70s)", type=["mp4", "avi", "mov"])
 
 FRAME_WINDOW = st.empty()
 
